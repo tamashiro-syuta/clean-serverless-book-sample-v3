@@ -11,7 +11,6 @@ services:
       - dynamodb-local
     env_file:
       - .env
-      - .env.dynamodb-local
     networks:
       - net
 
@@ -28,7 +27,6 @@ services:
       - VOLUME=$PWD
     env_file:
       - .env
-      - .env.dynamodb-local
     networks:
       - net
 
