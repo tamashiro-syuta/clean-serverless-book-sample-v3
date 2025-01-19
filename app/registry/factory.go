@@ -148,3 +148,10 @@ func (f *Factory) BuildDeleteMicropost() usecase.IDeleteMicropost {
 func (f *Factory) BuildCreateHelloMessage() usecase.ICreateHelloMessage {
 	return interactor.NewCreateHelloMessage()
 }
+
+func (f *Factory) BuildProductOperator() *adapter.ProductOperator {
+	return &adapter.ProductOperator{
+		Client: f.BuildResourceTableOperator(),
+		Mapper: f.BuildDynamoModelMapper(),
+	}
+}
