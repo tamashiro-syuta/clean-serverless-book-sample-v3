@@ -11,6 +11,8 @@ import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as dotenv from "dotenv";
 import { Bucket, EventType } from "aws-cdk-lib/aws-s3";
 import { LambdaDestination } from "aws-cdk-lib/aws-s3-notifications";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 
 dotenv.config({ path: "../.env" });
 
@@ -140,5 +142,21 @@ export class CdkStack extends Stack {
       EventType.OBJECT_REMOVED,
       new LambdaDestination(s3HandlerFunction)
     );
+
+    // Schedule Event Handler
+    const scheduleHandler = createLambdaFunction("schedule", "scheduleHandler");
+    scheduleHandler.addToRolePolicy(
+      new PolicyStatement({
+        actions: ["logs:*"],
+        effect: Effect.ALLOW,
+        resources: ["*"],
+      })
+    );
+    // Create EventBridge Rule
+    const eventRule = new Rule(this, "ScheduleRule", {
+      // NOTE: 5分ごとに実行
+      schedule: Schedule.rate(Duration.minutes(5)),
+    });
+    eventRule.addTarget(new LambdaFunction(scheduleHandler));
   }
 }
